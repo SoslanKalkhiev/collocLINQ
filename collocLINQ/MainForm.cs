@@ -55,14 +55,33 @@ namespace collocLINQ
 
         private void btnFilterByBrand_Click(object sender, EventArgs e)
         {
+            listBoxResults.Items.Clear();
+
             string brand = txtBrandFilter.Text.Trim();
 
-            var query = fleet.Cars
-                .Where(c => c.Brand.Equals(brand, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrWhiteSpace(brand))
+            {
+                listBoxResults.Items.Add("Введите марку для поиска.");
+                return;
+            }
 
-            listBoxResults.Items.Clear();
-            foreach (var car in query)
-                listBoxResults.Items.Add($"{car.Brand} - {car.MaxSpeed} км/ч, {car.EnginePower} л.с.");
+            var filteredCars = fleet.Cars
+                .Where(c => c.Brand != null &&
+                            c.Brand.IndexOf(brand, StringComparison.OrdinalIgnoreCase) >= 0)
+                .ToList();
+
+            if (filteredCars.Count == 0)
+            {
+                listBoxResults.Items.Add("Ничего не найдено.");
+                return;
+            }
+
+            foreach (var car in filteredCars)
+            {
+                listBoxResults.Items.Add(
+                    $"{car.Brand} | {car.BodyType} | {car.MaxSpeed} км/ч | {car.EnginePower} л.с."
+                );
+            }
         }
 
         private void btnSortByPower_Click(object sender, EventArgs e)
@@ -86,3 +105,4 @@ namespace collocLINQ
         }
     }
 }
+//создана доп ветвь
